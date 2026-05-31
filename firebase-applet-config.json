@@ -1,0 +1,9 @@
+{
+  "apiKey": "AIzaSyPlaceholderKey-NotRealCredential",
+  "authDomain": "alqady-workspace-app.firebaseapp.com",
+  "projectId": "alqady-workspace-app",
+  "storageBucket": "alqady-workspace-app.appspot.com",
+  "messagingSenderId": "000000000000",
+  "appId": "1:000000000000:web:abcdef0000000000000000",
+  "firestoreDatabaseId": "(default)"
+}

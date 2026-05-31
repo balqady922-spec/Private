@@ -1,0 +1,89 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isRole(roles) {
+      return isAuthenticated() && (getUserData().role in roles);
+    }
+
+    // Collection "users"
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && (request.auth.uid == userId || isRole(['admin']));
+    }
+
+    // Collection "workers"
+    match /workers/{workerId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated() && isRole(['admin', 'accountant']);
+      allow delete: if isAuthenticated() && isRole(['admin']);
+    }
+
+    // Collection "wages"
+    match /wages/{wageId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated() && isRole(['admin', 'accountant', 'supervisor']);
+      allow delete: if isAuthenticated() && isRole(['admin']);
+    }
+
+    // Collection "advances"
+    match /advances/{advanceId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated() && isRole(['admin', 'accountant']);
+      allow delete: if isAuthenticated() && isRole(['admin']);
+    }
+
+    // Collection "attendance"
+    match /attendance/{attendanceId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated() && isRole(['admin', 'accountant', 'supervisor']);
+      allow delete: if isAuthenticated() && isRole(['admin']);
+    }
+
+    // Collections representing Cash and Ledgers (cashbox, revenues, expenses)
+    match /cashbox/{txId} {
+      allow read: if isAuthenticated() && isRole(['admin', 'accountant']);
+      allow create, update: if isAuthenticated() && isRole(['admin', 'accountant']);
+      allow delete: if isAuthenticated() && isRole(['admin']);
+    }
+
+    match /revenues/{txId} {
+      allow read: if isAuthenticated() && isRole(['admin', 'accountant']);
+      allow create, update: if isAuthenticated() && isRole(['admin', 'accountant']);
+      allow delete: if isAuthenticated() && isRole(['admin']);
+    }
+
+    match /expenses/{txId} {
+      allow read: if isAuthenticated() && isRole(['admin', 'accountant']);
+      allow create, update: if isAuthenticated() && isRole(['admin', 'accountant']);
+      allow delete: if isAuthenticated() && isRole(['admin']);
+    }
+
+    // Collection "settings" (general configs)
+    match /settings/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isRole(['admin', 'accountant']);
+    }
+
+    // Collection "reports"
+    match /reports/{reportId} {
+      allow read: if isAuthenticated() && isRole(['admin', 'accountant']);
+      allow write: if isAuthenticated() && isRole(['admin', 'accountant']);
+    }
+
+    // Collection "notifications"
+    match /notifications/{notifId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isRole(['admin', 'accountant', 'supervisor']);
+    }
+  }
+}

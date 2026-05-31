@@ -1,0 +1,6 @@
+{
+  "name": "القاضي لإدارة الأجور والعمال",
+  "description": "تطبيق محاسبي احترافي متكامل لإدارة العمال والأجور اليومية والسلف والعهد والدوام والحضور وحركة الصندوق والتقارير المالية.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

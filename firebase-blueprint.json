@@ -1,0 +1,124 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Information about the application manager or accountant",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "fullName": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "accountant", "supervisor", "user"] },
+        "phone": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "fullName", "email", "role"]
+    },
+    "Worker": {
+      "title": "Worker Profile",
+      "description": "Logistical and salary info of a specific laborer",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "fullName": { "type": "string" },
+        "phone": { "type": "string" },
+        "profession": { "type": "string" },
+        "dailyWage": { "type": "number" },
+        "startDate": { "type": "string" },
+        "isArchived": { "type": "boolean" },
+        "photoUrl": { "type": "string" },
+        "notes": { "type": "string" },
+        "currentBalance": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "fullName", "profession", "dailyWage", "startDate"]
+    },
+    "WageRecord": {
+      "title": "Daily Wage Record",
+      "properties": {
+        "id": { "type": "string" },
+        "workerId": { "type": "string" },
+        "workerName": { "type": "string" },
+        "date": { "type": "string" },
+        "daysWorked": { "type": "number" },
+        "rate": { "type": "number" },
+        "totalEarned": { "type": "number" },
+        "notes": { "type": "string" },
+        "registeredBy": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "workerId", "date", "daysWorked", "rate", "totalEarned"]
+    },
+    "AdvanceRecord": {
+      "title": "Advance & Withdrawal Record",
+      "properties": {
+        "id": { "type": "string" },
+        "workerId": { "type": "string" },
+        "workerName": { "type": "string" },
+        "date": { "type": "string" },
+        "amount": { "type": "number" },
+        "type": { "type": "string", "enum": ["advance", "withdrawal"] },
+        "notes": { "type": "string" },
+        "registeredBy": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "workerId", "date", "amount", "type"]
+    },
+    "AttendanceRecord": {
+      "title": "Attendance & Leave Log",
+      "properties": {
+        "id": { "type": "string" },
+        "workerId": { "type": "string" },
+        "workerName": { "type": "string" },
+        "date": { "type": "string" },
+        "status": { "type": "string", "enum": ["present", "absent", "delayed", "leave"] },
+        "delayMinutes": { "type": "number" },
+        "overtimeHours": { "type": "number" },
+        "notes": { "type": "string" },
+        "recordedBy": { "type": "string" }
+      },
+      "required": ["id", "workerId", "date", "status"]
+    },
+    "CashTransaction": {
+      "title": "Treasury Ledger Transaction",
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "type": "string", "enum": ["receipt", "payment"] },
+        "category": { "type": "string" },
+        "amount": { "type": "number" },
+        "title": { "type": "string" },
+        "date": { "type": "string" },
+        "relatedId": { "type": "string" },
+        "notes": { "type": "string" },
+        "recordedBy": { "type": "string" }
+      },
+      "required": ["id", "type", "amount", "title", "date"]
+    }
+  },
+  "firestore": {
+    "users": {
+      "schema": "User",
+      "description": "Collection of system managers"
+    },
+    "workers": {
+      "schema": "Worker",
+      "description": "Collection of managed laborers"
+    },
+    "wages": {
+      "schema": "WageRecord",
+      "description": "Collection of daily work wage logs"
+    },
+    "advances": {
+      "schema": "AdvanceRecord",
+      "description": "Collection of srv/salary advances issued"
+    },
+    "attendance": {
+      "schema": "AttendanceRecord",
+      "description": "Collection of daily worker clock entries"
+    },
+    "transactions": {
+      "schema": "CashTransaction",
+      "description": "Cash box receipt and payment logs"
+    }
+  }
+}

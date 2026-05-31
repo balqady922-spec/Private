@@ -1,0 +1,47 @@
+yamlname: Build Android APK
+
+on:
+  push:
+    branches:
+      - main  # سيتم البناء التلقائي عند الرفع على فرع main الموضح في صورتك
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Web Application
+        run: npm run build
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Android Project via Capacitor
+        run: |
+          npx cap sync android
+
+      - name: Make Gradle Executable
+        run: chmod +x android/gradlew
+
+      - name: Build Debug APK
+        run: cd android && ./gradlew assembleDebug
+
+      - name: Upload Generated APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: App-Debug-APK
+          path: android/app/build/
