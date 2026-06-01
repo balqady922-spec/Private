@@ -210,6 +210,7 @@ export const SettingsPage: React.FC = () => {
               >
                 <option value="دولار">دولار ($)</option>
                 <option value="ريال">ريال سعودي (ر.س)</option>
+                <option value="ريال يمني">ريال يمني (ر.ي)</option>
                 <option value="دينار">دينار عراقي (د.ع)</option>
                 <option value="جنيه">جنيه مصري (ج.م)</option>
                 <option value="درهم">درهم إماراتي (د.إ)</option>

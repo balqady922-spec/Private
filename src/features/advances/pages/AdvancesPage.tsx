@@ -12,7 +12,8 @@ import {
   Plus, 
   Printer, 
   AlertTriangle, 
-  Check
+  Check,
+  Share2
 } from 'lucide-react';
 
 export const AdvancesPage: React.FC = () => {
@@ -58,6 +59,18 @@ export const AdvancesPage: React.FC = () => {
     setSelectedVoucherForPrint(v);
     setTimeout(() => {
       printDocument('printable_voucher_box', `سند_صرف_${v.id}`);
+    }, 100);
+  };
+
+  const handleExportVoucher = (v: AdvanceRecord, mode: 'share' | 'download') => {
+    setSelectedVoucherForPrint(v);
+    setTimeout(() => {
+      const content = document.getElementById('printable_voucher_box');
+      if (content) {
+        import('../../../services/pdfService').then(({ exportPDF }) => {
+          exportPDF(content.innerHTML, `سند_صرف_${v.id}`, mode);
+        });
+      }
     }, 100);
   };
 
@@ -279,13 +292,29 @@ export const AdvancesPage: React.FC = () => {
                       </td>
                       <td className="p-2.5 text-gray-500 max-w-40 truncate" title={v.notes}>{v.notes}</td>
                       <td className="p-2.5 text-left whitespace-nowrap">
-                        <button
-                          onClick={() => handlePrintVoucher(v)}
-                          className="px-2.5 py-1.5 border border-gray-200 hover:border-emerald-500 text-gray-600 hover:text-emerald-800 bg-white hover:bg-emerald-50 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 cursor-pointer"
-                        >
-                          <Printer className="w-3.5 h-3.5" />
-                          <span>طباعة السند</span>
-                        </button>
+                        <div className="flex items-center gap-2 justify-end">
+                          <button
+                            onClick={() => handlePrintVoucher(v)}
+                            className="px-2.5 py-1.5 border border-gray-200 hover:border-emerald-500 text-gray-600 hover:text-emerald-800 bg-white hover:bg-emerald-50 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 cursor-pointer"
+                          >
+                            <Printer className="w-3.5 h-3.5" />
+                            <span>طباعة السند</span>
+                          </button>
+                          <button
+                            onClick={() => handleExportVoucher(v, 'share')}
+                            className="px-2.5 py-1.5 bg-[#25D366] hover:bg-[#128C7E] text-white rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 cursor-pointer shadow-sm"
+                          >
+                            <Share2 className="w-3.5 h-3.5" />
+                            <span>مشاركة</span>
+                          </button>
+                          <button
+                            onClick={() => handleExportVoucher(v, 'download')}
+                            className="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 cursor-pointer shadow-sm"
+                          >
+                            <svg className="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            <span>تنزيل PDF</span>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}

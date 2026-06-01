@@ -5,14 +5,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../../store/AppContext';
-import { printDocument, downloadCSV, getQRCodeUrl, printMonthlyReport, printStructuredWorkerReport } from '../../../services/pdfService';
+import { printDocument, downloadCSV, getQRCodeUrl, printMonthlyReport, printStructuredWorkerReport, exportStructuredWorkerReport, exportMonthlyReport } from '../../../services/pdfService';
 import { 
   TrendingUp, 
   FileText, 
   Download, 
   Printer, 
   Calendar, 
-  Filter
+  Filter,
+  Share2
 } from 'lucide-react';
 
 export const ReportsPage: React.FC = () => {
@@ -106,6 +107,22 @@ export const ReportsPage: React.FC = () => {
     });
   };
 
+  const handleExportStructuredWorkerReport = (mode: 'share' | 'download') => {
+    if (!currentWorker) return;
+    exportStructuredWorkerReport({
+      workerName: currentWorker.fullName,
+      workerProfession: currentWorker.profession,
+      dailyWage: currentWorker.dailyWage,
+      startDate: currentWorker.startDate,
+      totalWages: totalEarned,
+      totalAdvances: totalAdvances,
+      currency: settings.currency,
+      wages: workerWages,
+      advances: workerAdvances,
+      mode
+    });
+  };
+
   const handlePrintMonthlyReport = () => {
     const periodLabel = periodFilter === 'day' 
       ? 'آخر 24 ساعة' 
@@ -121,6 +138,25 @@ export const ReportsPage: React.FC = () => {
       activeWorkersCount: workers.filter(w => !w.isArchived).length,
       wages: periodWages,
       advances: periodAdvances
+    });
+  };
+
+  const handleExportMonthlyReport = (mode: 'share' | 'download') => {
+    const periodLabel = periodFilter === 'day' 
+      ? 'آخر 24 ساعة' 
+      : periodFilter === 'week' 
+        ? 'آخر 7 أيام' 
+        : 'آخر 30 يوم (تقرير شهري)';
+
+    exportMonthlyReport({
+      periodLabel,
+      totalWages: totalPeriodWagesSpend,
+      totalAdvances: totalPeriodAdvancesSpend,
+      currency: settings.currency,
+      activeWorkersCount: workers.filter(w => !w.isArchived).length,
+      wages: periodWages,
+      advances: periodAdvances,
+      mode
     });
   };
 
@@ -238,7 +274,7 @@ export const ReportsPage: React.FC = () => {
                     <span className="text-[10px] text-gray-400 font-mono">الكود المحاسبي: {currentWorker.id}</span>
                   </div>
 
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2 mt-3">
                     <button
                       onClick={handleExportCSV}
                       className="px-3 py-1.5 bg-white border border-gray-200 hover:border-emerald-600 text-gray-600 hover:text-emerald-800 rounded-xl text-[10px] font-bold transition flex items-center gap-1 cursor-pointer"
@@ -259,6 +295,20 @@ export const ReportsPage: React.FC = () => {
                     >
                       <Printer className="w-3.5 h-3.5" />
                       <span>كشف منظم (PDF)</span>
+                    </button>
+                    <button
+                      onClick={() => handleExportStructuredWorkerReport('share')}
+                      className="px-3 py-1.5 bg-[#25D366] hover:bg-[#128C7E] text-white rounded-xl text-[10px] font-bold transition flex items-center gap-1 cursor-pointer shadow-sm"
+                    >
+                      <Share2 className="w-3.5 h-3.5" />
+                      <span>مشاركة واتساب</span>
+                    </button>
+                    <button
+                      onClick={() => handleExportStructuredWorkerReport('download')}
+                      className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-bold transition flex items-center gap-1 cursor-pointer shadow-sm"
+                    >
+                      <svg className="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                      <span>تنزيل (PDF)</span>
                     </button>
                   </div>
                 </div>
@@ -434,7 +484,21 @@ export const ReportsPage: React.FC = () => {
                 className="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs"
               >
                 <Printer className="w-4 h-4" />
-                <span>طباعة التقرير الدوري (PDF)</span>
+                <span>طباعة (PDF)</span>
+              </button>
+              <button
+                onClick={() => handleExportMonthlyReport('share')}
+                className="px-3.5 py-2 bg-[#25D366] hover:bg-[#128C7E] text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs"
+              >
+                <Share2 className="w-4 h-4" />
+                <span>مشاركة عبر واتساب</span>
+              </button>
+              <button
+                onClick={() => handleExportMonthlyReport('download')}
+                className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs"
+              >
+                <svg className="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <span>تنزيل (PDF)</span>
               </button>
             </div>
           </div>

@@ -3,6 +3,86 @@
  */
 
 import { Worker, WageRecord, AdvanceRecord, CompanySettings } from '../core/types';
+import { toPng } from 'html-to-image';
+import { jsPDF } from 'jspdf';
+
+export const exportPDF = async (htmlContent: string, filename: string, mode: 'share' | 'download' = 'share') => {
+  const container = document.createElement('div');
+  container.style.position = 'fixed';
+  container.style.left = '-9999px';
+  container.style.top = '0';
+  document.body.appendChild(container);
+
+  const element = document.createElement('div');
+  element.style.width = '800px';
+  element.style.padding = '20px';
+  element.style.backgroundColor = 'white';
+  element.innerHTML = htmlContent;
+  container.appendChild(element);
+
+  try {
+    // We must wait a tiny bit to ensure the browser has laid out the DOM element and fonts are loaded
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    const dataUrl = await toPng(element, { 
+      quality: 0.95, 
+      pixelRatio: 2, 
+      skipFonts: false,
+    });
+    
+    const StandardPDF = new jsPDF('p', 'mm', 'a4');
+    const pdfWidth = StandardPDF.internal.pageSize.getWidth();
+    const pdfHeight = (element.offsetHeight * pdfWidth) / element.offsetWidth;
+    
+    // create a PDF with standard A4 width, but dynamic height so nothing gets cut off
+    const pdf = new jsPDF({
+      orientation: 'p',
+      unit: 'mm',
+      format: [pdfWidth, Math.max(pdfHeight, StandardPDF.internal.pageSize.getHeight())]
+    });
+    
+    pdf.addImage(dataUrl, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    const pdfBlob = pdf.output('blob');
+    
+    if (mode === 'share') {
+      // Check if web share is available and supports files
+      if (navigator.share && navigator.canShare) {
+        const file = new File([pdfBlob], filename + '.pdf', { type: 'application/pdf' });
+        if (navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              title: filename,
+              text: 'مرفق لكم كشف من نظام القاضي',
+              files: [file]
+            });
+            document.body.removeChild(container);
+            return;
+          } catch (shareErr) {
+            console.log('Share failed, fallback to download', shareErr);
+          }
+        }
+      }
+    }
+    
+    // Fallback or explicit download mode
+    const url = URL.createObjectURL(pdfBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename + '.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+  } catch (error) {
+    console.error('PDF generation error:', error);
+    alert('حدث خطأ أثناء توليد أو مشاركة ملف PDF.');
+  } finally {
+    if (document.body.contains(container)) {
+      document.body.removeChild(container);
+    }
+  }
+};
 
 export function downloadCSV<T>(
   data: T[],
@@ -412,6 +492,48 @@ export function printMonthlyReport(params: {
       document.body.removeChild(printSection);
     }, 500);
   }
+}
+
+export function exportStructuredWorkerReport(params: {
+  workerName: string;
+  workerProfession: string;
+  dailyWage: number;
+  startDate: string;
+  totalWages: number;
+  totalAdvances: number;
+  currency: string;
+  wages: WageRecord[];
+  advances: AdvanceRecord[];
+  mode: 'share' | 'download';
+}) {
+  const { workerName, workerProfession, dailyWage, startDate, totalWages, totalAdvances, currency, wages, advances, mode } = params;
+
+  const htmlContent = generateMonthlyReportHTML({
+    periodLabel: `كشف حساب وحركة مالية مستقلة للعامل: ${workerName} (${workerProfession}) • اليومية: ${dailyWage.toLocaleString()} ${currency} • تاريخ البدء: ${startDate}`,
+    totalWages,
+    totalAdvances,
+    currency,
+    activeWorkersCount: 1,
+    wages,
+    advances
+  });
+
+  exportPDF(htmlContent, `كشف_حساب_${workerName.replace(/\s+/g, '_')}`, mode);
+}
+
+export function exportMonthlyReport(params: {
+  periodLabel: string;
+  totalWages: number;
+  totalAdvances: number;
+  currency: string;
+  activeWorkersCount: number;
+  wages: WageRecord[];
+  advances: AdvanceRecord[];
+  mode: 'share' | 'download';
+}) {
+  const { mode, ...reportParams } = params;
+  const htmlContent = generateMonthlyReportHTML(reportParams);
+  exportPDF(htmlContent, `التقرير_الشهري_${new Date().getTime()}`, mode);
 }
 
 export function printStructuredWorkerReport(params: {
