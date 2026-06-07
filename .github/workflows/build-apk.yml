@@ -44,8 +44,9 @@ jobs:
 
       - name: Repair Corrupted Android Icons
         run: |
-          PNG_B64="iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
-          for f in $(find android/app/src/main/res/mipmap-* -name "*.png"); do
+          # 48x48 transparent PNG base64
+          PNG_B64="iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABDSURBVGhD7cMBAQAAAQIw/q1HBiBwAAABgAMQOAAYAIEbABgAgQMAOIABEDgAABiAwAEAzAAMgMABAMAADA7gAAjcv4FpA9vN3+vOAAAAAElFTkSuQmCC"
+          for f in $(find android/app/src/main/res/drawable* android/app/src/main/res/mipmap* -name "*.png"); do
             echo $PNG_B64 | base64 -d > $f
           done
 
