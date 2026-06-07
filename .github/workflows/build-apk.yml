@@ -44,10 +44,9 @@ jobs:
 
       - name: Repair Corrupted Android Icons
         run: |
-          # 48x48 transparent PNG base64
-          PNG_B64="iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABDSURBVGhD7cMBAQAAAQIw/q1HBiBwAAABgAMQOAAYAIEbABgAgQMAOIABEDgAABiAwAEAzAAMgMABAMAADA7gAAjcv4FpA9vN3+vOAAAAAElFTkSuQmCC"
+          curl -sL https://upload.wikimedia.org/wikipedia/commons/c/ca/1x1.png -o valid.png
           for f in $(find android/app/src/main/res/drawable* android/app/src/main/res/mipmap* -name "*.png"); do
-            echo $PNG_B64 | base64 -d > $f
+            cp valid.png $f
           done
 
       - name: Repair Gradle Wrapper and setup execute permission
