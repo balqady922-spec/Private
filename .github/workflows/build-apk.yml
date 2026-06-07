@@ -42,13 +42,6 @@ jobs:
       - name: Sync Capacitor Android Project
         run: npx cap sync android
 
-      - name: Repair Corrupted Android Icons
-        run: |
-          curl -sL https://upload.wikimedia.org/wikipedia/commons/c/ca/1x1.png -o valid.png
-          for f in $(find android/app/src/main/res/drawable* android/app/src/main/res/mipmap* -name "*.png"); do
-            cp valid.png $f
-          done
-
       - name: Repair Gradle Wrapper and setup execute permission
         working-directory: ./android
         run: |
