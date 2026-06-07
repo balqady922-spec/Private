@@ -42,6 +42,13 @@ jobs:
       - name: Sync Capacitor Android Project
         run: npx cap sync android
 
+      - name: Repair Corrupted Android Icons
+        run: |
+          PNG_B64="iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
+          for f in $(find android/app/src/main/res/mipmap-* -name "*.png"); do
+            echo $PNG_B64 | base64 -d > $f
+          done
+
       - name: Repair Gradle Wrapper and setup execute permission
         working-directory: ./android
         run: |
