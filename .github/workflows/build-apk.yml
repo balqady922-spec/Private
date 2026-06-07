@@ -23,7 +23,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22' # تم التحديث إلى إصدار 22 لحل مشكلة توافقية Capacitor
+          node-version: '20'
           cache: 'npm'
 
       - name: Setup Java (Android SDK requires Java 17)
