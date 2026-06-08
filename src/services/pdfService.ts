@@ -5,6 +5,9 @@
 import { Worker, WageRecord, AdvanceRecord, CompanySettings } from '../core/types';
 import { toPng } from 'html-to-image';
 import { jsPDF } from 'jspdf';
+import { Filesystem, Directory } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
+import { Capacitor } from '@capacitor/core';
 
 export const exportPDF = async (htmlContent: string, filename: string, mode: 'share' | 'download' = 'share') => {
   const container = document.createElement('div');
@@ -18,23 +21,29 @@ export const exportPDF = async (htmlContent: string, filename: string, mode: 'sh
   element.style.padding = '20px';
   element.style.backgroundColor = 'white';
   element.innerHTML = htmlContent;
+
+  const images = element.querySelectorAll('img');
+  images.forEach(img => {
+    if (img.src.includes('qrserver.com')) {
+      img.style.display = 'none';
+      img.crossOrigin = 'anonymous';
+    }
+  });
+
   container.appendChild(element);
 
   try {
-    // We must wait a tiny bit to ensure the browser has laid out the DOM element and fonts are loaded
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await new Promise(resolve => setTimeout(resolve, 800));
     
     const dataUrl = await toPng(element, { 
       quality: 0.95, 
       pixelRatio: 2, 
-      skipFonts: false,
+      skipFonts: false 
     });
     
     const StandardPDF = new jsPDF('p', 'mm', 'a4');
     const pdfWidth = StandardPDF.internal.pageSize.getWidth();
     const pdfHeight = (element.offsetHeight * pdfWidth) / element.offsetWidth;
-    
-    // create a PDF with standard A4 width, but dynamic height so nothing gets cut off
     const pdf = new jsPDF({
       orientation: 'p',
       unit: 'mm',
@@ -42,11 +51,28 @@ export const exportPDF = async (htmlContent: string, filename: string, mode: 'sh
     });
     
     pdf.addImage(dataUrl, 'PNG', 0, 0, pdfWidth, pdfHeight);
-    const pdfBlob = pdf.output('blob');
     
-    if (mode === 'share') {
-      // Check if web share is available and supports files
-      if (navigator.share && navigator.canShare) {
+    if (Capacitor.isNativePlatform()) {
+      const pdfBase64 = pdf.output('datauristring').split(',')[1];
+      const safeName = filename.replace(/[^a-zA-Z0-9_]/g, '_');
+      
+      const writeResult = await Filesystem.writeFile({
+        path: safeName + '.pdf',
+        data: pdfBase64,
+        directory: Directory.Cache
+      });
+      
+      await Share.share({
+        title: safeName,
+        text: 'مرفق لكم كشف من نظام القاضي',
+        url: writeResult.uri,
+        dialogTitle: 'مشاركة PDF'
+      });
+      
+    } else {
+      const pdfBlob = pdf.output('blob');
+      
+      if (mode === 'share' && navigator.share && navigator.canShare) {
         const file = new File([pdfBlob], filename + '.pdf', { type: 'application/pdf' });
         if (navigator.canShare({ files: [file] })) {
           try {
@@ -55,24 +81,20 @@ export const exportPDF = async (htmlContent: string, filename: string, mode: 'sh
               text: 'مرفق لكم كشف من نظام القاضي',
               files: [file]
             });
-            document.body.removeChild(container);
             return;
-          } catch (shareErr) {
-            console.log('Share failed, fallback to download', shareErr);
-          }
+          } catch (e) { console.log('Share failed', e); }
         }
       }
+      
+      const url = URL.createObjectURL(pdfBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename + '.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     }
-    
-    // Fallback or explicit download mode
-    const url = URL.createObjectURL(pdfBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename + '.pdf';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
     
   } catch (error) {
     console.error('PDF generation error:', error);
