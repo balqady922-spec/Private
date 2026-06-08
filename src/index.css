@@ -135,3 +135,52 @@ table td {
   border-top-color: #D4AF37;
   transform: translateY(-2px);
 }
+
+/* Print CSS */
+@media print {
+  body {
+    background-color: white;
+    color: black;
+  }
+  
+  .no-print, nav, header, button, .sidebar {
+    display: none !important;
+  }
+  
+  table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    page-break-inside: auto;
+  }
+  
+  table tbody tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+  
+  table th, table td {
+    border: 1px solid #ccc !important;
+    padding: 8px !important;
+    font-size: 11px !important;
+    color: black !important;
+  }
+  
+  table thead th {
+    background-color: #f1f3f5 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  .badge {
+    border: 1px solid #ccc !important;
+    background: transparent !important;
+    color: black !important;
+    padding: 2px 6px;
+  }
+  
+  .shadow-xs, .shadow-sm, .shadow-md, .shadow-lg, .stat-card {
+    box-shadow: none !important;
+    border: 1px solid #eaeaea !important;
+  }
+}
+
