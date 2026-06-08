@@ -128,9 +128,9 @@ export const WorkersPage: React.FC = () => {
         </button>
       </div>
 
-      <div className="space-y-4 bg-white p-5 rounded-3xl border border-gray-100 shadow-xs">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="md:col-span-2 relative">
+      <div className="space-y-4 bg-white p-4 sm:p-5 rounded-3xl border border-gray-100 shadow-xs">
+        <div className="flex flex-col md:flex-row gap-3">
+          <div className="flex-1 relative">
             <span className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <Search className="h-4 w-4 text-gray-400" />
             </span>
@@ -138,15 +138,28 @@ export const WorkersPage: React.FC = () => {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="ابحث باسم العامل، تليفونه، مهنته..."
+              placeholder="ابحث باسم العامل، تليفونه..."
               className="w-full rounded-xl bg-gray-50 border border-gray-200 pr-10 pl-3 py-2.5 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-emerald-600 focus:border-emerald-600 focus:bg-white transition animate-none"
             />
           </div>
 
-          <div className="flex bg-gray-50 px-2 py-1.5 rounded-xl border border-gray-200">
+          <div className="w-full md:w-48">
+            <select
+              value={professionFilter}
+              onChange={(e) => setProfessionFilter(e.target.value)}
+              className="w-full rounded-xl bg-gray-50 border border-gray-200 px-3 py-2.5 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-emerald-600 focus:border-emerald-600 focus:bg-white transition"
+            >
+              <option value="All">كل المهن</option>
+              {professionsList.filter((p) => p !== 'All').map((p) => (
+                <option key={p} value={p}>{p}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex w-full md:w-auto bg-gray-50 px-1.5 py-1.5 rounded-xl border border-gray-200 shrink-0">
             <button
               onClick={() => setStatusFilter('active')}
-              className={`flex-1 text-center py-1 text-xs font-bold rounded-lg transition ${
+              className={`px-3 sm:px-4 py-1 text-xs font-bold rounded-lg transition ${
                 statusFilter === 'active' ? 'bg-emerald-600 text-white shadow-xs' : 'text-gray-500 hover:text-emerald-700'
               }`}
             >
@@ -154,7 +167,7 @@ export const WorkersPage: React.FC = () => {
             </button>
             <button
               onClick={() => setStatusFilter('archived')}
-              className={`flex-1 text-center py-1 text-xs font-bold rounded-lg transition ${
+              className={`px-3 sm:px-4 py-1 text-xs font-bold rounded-lg transition ${
                 statusFilter === 'archived' ? 'bg-emerald-600 text-white shadow-xs' : 'text-gray-500 hover:text-emerald-700'
               }`}
             >
@@ -162,7 +175,7 @@ export const WorkersPage: React.FC = () => {
             </button>
             <button
               onClick={() => setStatusFilter('all')}
-              className={`flex-1 text-center py-1 text-xs font-bold rounded-lg transition ${
+              className={`px-3 sm:px-4 py-1 text-xs font-bold rounded-lg transition ${
                 statusFilter === 'all' ? 'bg-emerald-600 text-white shadow-xs' : 'text-gray-500 hover:text-emerald-700'
               }`}
             >
