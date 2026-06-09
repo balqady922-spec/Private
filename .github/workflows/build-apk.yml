@@ -26,11 +26,11 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
-      - name: Setup Java (Android SDK requires Java 21)
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
-          java-version: '21'
+          java-version: '17'
           cache: 'gradle'
 
       - name: Install NPM Dependencies
@@ -42,19 +42,18 @@ jobs:
       - name: Sync Capacitor Android Project
         run: npx cap sync android
 
-      - name: Repair Gradle Wrapper and setup execute permission
+      - name: Setup Gradle
         working-directory: ./android
         run: |
-          gradle wrapper --gradle-version 8.14.3
           chmod +x ./gradlew
 
       - name: Build Debug APK
         working-directory: ./android
-        run: ./gradlew assembleDebug
+        run: ./gradlew assembleDebug --no-daemon
 
       - name: Build Release APK
         working-directory: ./android
-        run: ./gradlew assembleRelease
+        run: ./gradlew assembleRelease --no-daemon
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
@@ -63,30 +62,7 @@ jobs:
           path: android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
 
-      - name: Sign Release APK (Optional)
-        id: sign_app
-        uses: r0adkll/sign-android-release@v1
-        # This step will only run if you configure the KEYSTORE_BASE64 secret in GitHub
-        if: ${{ env.KEYSTORE_BASE64 != '' }}
-        env:
-          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
-        with:
-          releaseDirectory: android/app/build/outputs/apk/release
-          signingKeyBase64: ${{ secrets.KEYSTORE_BASE64 }}
-          alias: ${{ secrets.KEY_ALIAS }}
-          keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
-
-      - name: Upload Release APK (Signed)
-        if: ${{ steps.sign_app.outputs.signedReleaseFile != '' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-release-signed
-          path: ${{ steps.sign_app.outputs.signedReleaseFile }}
-          retention-days: 30
-
-      - name: Upload Release APK (Unsigned)
-        if: ${{ steps.sign_app.outputs.signedReleaseFile == '' }}
+      - name: Upload Release APK
         uses: actions/upload-artifact@v4
         with:
           name: app-release-unsigned

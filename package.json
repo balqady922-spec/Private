@@ -9,7 +9,9 @@
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
-    "build:android": "cd android && chmod +x ./gradlew && ./gradlew assembleDebug"
+    "build:android": "cd android && chmod +x ./gradlew && ./gradlew assembleDebug",
+    "build:android:clean": "cd android && chmod +x ./gradlew && ./gradlew clean",
+    "build:android:release": "cd android && chmod +x ./gradlew && ./gradlew assembleRelease"
   },
   "dependencies": {
     "@capacitor/filesystem": "^8.1.2",
