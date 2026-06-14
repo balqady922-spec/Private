@@ -1,3 +1,4 @@
+import { getLocalDateString } from '../../../core/utils';
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -24,7 +25,7 @@ export const CashBoxPage: React.FC = () => {
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState(500);
   const [category, setCategory] = useState('دفعة عميل');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(getLocalDateString());
   const [notes, setNotes] = useState('');
 
   const [typeFilter, setTypeFilter] = useState<'all' | 'receipt' | 'payment'>('all');
@@ -63,7 +64,7 @@ export const CashBoxPage: React.FC = () => {
     setTitle('');
     setAmount(200);
     setCategory(type === 'receipt' ? 'دفعة عميل' : 'مصاريف تشغيلية');
-    setDate(new Date().toISOString().split('T')[0]);
+    setDate(getLocalDateString());
     setNotes('');
     setShowVoucherModal(true);
   };

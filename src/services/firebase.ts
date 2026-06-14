@@ -98,12 +98,10 @@ export async function testConnection() {
   try {
     // Tests connection to server
     await getDocFromServer(doc(db, 'test', 'connection'));
-    console.log('Firebase connection verified successful');
   } catch (error: any) {
     if (error instanceof Error && error.message.includes('the client is offline')) {
       console.warn("Please check your Firebase configuration. Client is offline.");
     }
-    // We do not crash the app, just log connection state
   }
 }
 

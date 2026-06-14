@@ -1,3 +1,4 @@
+import { getLocalDateString } from '../../../core/utils';
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -21,7 +22,7 @@ import {
 export const AttendancePage: React.FC = () => {
   const { workers, attendance, recordAttendance, currentUser } = useApp();
 
-  const [targetDate, setTargetDate] = useState(new Date().toISOString().split('T')[0]);
+  const [targetDate, setTargetDate] = useState(getLocalDateString());
   const activeWorkers = workers.filter(w => !w.isArchived);
 
   const [statusMap, setStatusMap] = useState<Record<string, 'present' | 'absent' | 'delayed' | 'leave'>>({});

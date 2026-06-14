@@ -33,10 +33,19 @@ export const DashboardPage: React.FC = () => {
     .reduce((sum, item) => sum + item.amount, 0);
   const currentCashBoxBalance = totalInflows - totalOutflows;
 
+  const wageTotals: Record<string, number> = {};
+  for (const wg of wages) {
+    wageTotals[wg.workerId] = (wageTotals[wg.workerId] || 0) + wg.totalEarned;
+  }
+  const advanceTotals: Record<string, number> = {};
+  for (const adv of advances) {
+    advanceTotals[adv.workerId] = (advanceTotals[adv.workerId] || 0) + adv.amount;
+  }
+
   const deficitWorkers = workers
     .map(w => {
-      const workerWages = wages.filter(wg => wg.workerId === w.id).reduce((sum, item) => sum + item.totalEarned, 0);
-      const workerAdvances = advances.filter(adv => adv.workerId === w.id).reduce((sum, item) => sum + item.amount, 0);
+      const workerWages = wageTotals[w.id] || 0;
+      const workerAdvances = advanceTotals[w.id] || 0;
       const balance = workerWages - workerAdvances;
       return { id: w.id, fullName: w.fullName, balance, workerWages, workerAdvances };
     })
@@ -47,7 +56,12 @@ export const DashboardPage: React.FC = () => {
   const last5Days = Array.from({ length: 5 }).map((_, i) => {
     const d = new Date();
     d.setDate(d.getDate() - i);
-    const dateStr = d.toISOString().split('T')[0];
+    // adjust for local timezone correctly
+    const dateStr = [
+      d.getFullYear(),
+      String(d.getMonth() + 1).padStart(2, '0'),
+      String(d.getDate()).padStart(2, '0')
+    ].join('-');
     const dayWages = wages.filter(w => w.date === dateStr).reduce((sum, item) => sum + item.totalEarned, 0);
     const dayAdvances = advances.filter(a => a.date === dateStr).reduce((sum, item) => sum + item.amount, 0);
     return { date: dateStr, wages: dayWages, advances: dayAdvances };

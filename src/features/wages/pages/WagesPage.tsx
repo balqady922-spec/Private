@@ -1,3 +1,4 @@
+import { getLocalDateString } from '../../../core/utils';
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -18,7 +19,7 @@ import {
 export const WagesPage: React.FC = () => {
   const { workers, wages, recordWages, settings, currentUser } = useApp();
   
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [selectedDate, setSelectedDate] = useState(getLocalDateString());
   const [wageNotes, setWageNotes] = useState('');
   
   const activeWorkers = workers.filter(w => !w.isArchived);
@@ -74,7 +75,14 @@ export const WagesPage: React.FC = () => {
     });
 
     if (recordsToSave.length === 0) {
-      alert('يرجى اختيار اسم كشف عامل واحد على الأقل لتسجيل أجره.');
+      setWageNotes('');
+      setRecordedSuccessfully(false);
+      // We will show a temporary error message using standard toast-like logic or just return
+      const tempError = document.createElement('div');
+      tempError.className = 'fixed top-4 left-1/2 -translate-x-1/2 bg-red-600 text-white px-4 py-2 rounded shadow-lg z-50 text-sm font-bold';
+      tempError.innerText = 'يرجى اختيار اسم كشف عامل واحد على الأقل لتسجيل أجره.';
+      document.body.appendChild(tempError);
+      setTimeout(() => document.body.removeChild(tempError), 3500);
       return;
     }
 

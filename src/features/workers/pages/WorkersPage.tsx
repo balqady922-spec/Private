@@ -1,3 +1,4 @@
+import { getLocalDateString } from '../../../core/utils';
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -32,7 +33,7 @@ export const WorkersPage: React.FC = () => {
   const [phone, setPhone] = useState('');
   const [profession, setProfession] = useState('');
   const [dailyWage, setDailyWage] = useState(120);
-  const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
+  const [startDate, setStartDate] = useState(getLocalDateString());
   const [notes, setNotes] = useState('');
   const [photoUrl, setPhotoUrl] = useState('');
 
@@ -54,7 +55,7 @@ export const WorkersPage: React.FC = () => {
     setPhone('');
     setProfession('');
     setDailyWage(120);
-    setStartDate(new Date().toISOString().split('T')[0]);
+    setStartDate(getLocalDateString());
     setNotes('');
     setPhotoUrl('');
     setEditingWorker(null);

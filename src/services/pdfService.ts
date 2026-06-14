@@ -82,7 +82,7 @@ export const exportPDF = async (htmlContent: string, filename: string, mode: 'sh
               files: [file]
             });
             return;
-          } catch (e) { console.log('Share failed', e); }
+          } catch (e) { console.error('Share failed', e); }
         }
       }
       
@@ -98,7 +98,11 @@ export const exportPDF = async (htmlContent: string, filename: string, mode: 'sh
     
   } catch (error) {
     console.error('PDF generation error:', error);
-    alert('حدث خطأ أثناء توليد أو مشاركة ملف PDF.');
+    const tempError = document.createElement('div');
+    tempError.className = 'fixed bottom-4 left-1/2 -translate-x-1/2 bg-red-600 text-white px-4 py-2 rounded shadow-lg z-50 text-sm font-bold';
+    tempError.innerText = 'حدث خطأ أثناء توليد أو مشاركة ملف PDF.';
+    document.body.appendChild(tempError);
+    setTimeout(() => document.body.removeChild(tempError), 3500);
   } finally {
     if (document.body.contains(container)) {
       document.body.removeChild(container);
@@ -686,7 +690,11 @@ export const generateStatementPDF = (
 
   const printWindow = window.open('', '_blank');
   if (!printWindow) {
-    alert('الرجاء السماح بالنوافذ المنبثقة (Popups) لتتمكن من تحميل الـ PDF');
+    const tempError = document.createElement('div');
+    tempError.className = 'fixed bottom-4 left-1/2 -translate-x-1/2 bg-amber-600 text-white px-4 py-2 rounded shadow-lg z-[999999] text-sm font-bold';
+    tempError.innerText = 'الرجاء السماح بالنوافذ المنبثقة (Popups) لتتمكن من تحميل الـ PDF';
+    document.body.appendChild(tempError);
+    setTimeout(() => document.body.removeChild(tempError), 3500);
     return;
   }
 

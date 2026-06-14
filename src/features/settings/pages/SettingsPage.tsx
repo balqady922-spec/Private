@@ -1,3 +1,4 @@
+import { getLocalDateString } from '../../../core/utils';
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -55,7 +56,7 @@ export const SettingsPage: React.FC = () => {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `نسخة_احتياطية_القاضي_${new Date().toISOString().split('T')[0]}.json`);
+    downloadAnchor.setAttribute("download", `نسخة_احتياطية_القاضي_${getLocalDateString()}.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();

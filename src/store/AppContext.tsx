@@ -121,10 +121,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [transactions, setTransactions] = useState<CashTransaction[]>([]);
 
   const workers = useMemo(() => {
+    const wageTotals: Record<string, number> = {};
+    for (const wg of wages) {
+      wageTotals[wg.workerId] = (wageTotals[wg.workerId] || 0) + wg.totalEarned;
+    }
+    
+    const advanceTotals: Record<string, number> = {};
+    for (const adv of advances) {
+      advanceTotals[adv.workerId] = (advanceTotals[adv.workerId] || 0) + adv.amount;
+    }
+
     return workersState.map(w => {
-      const workerWages = wages.filter(wg => wg.workerId === w.id).reduce((sum, item) => sum + item.totalEarned, 0);
-      const workerAdvances = advances.filter(adv => adv.workerId === w.id).reduce((sum, item) => sum + item.amount, 0);
-      const computedBalance = workerWages - workerAdvances;
+      const computedBalance = (wageTotals[w.id] || 0) - (advanceTotals[w.id] || 0);
       return { ...w, currentBalance: computedBalance };
     });
   }, [workersState, wages, advances]);

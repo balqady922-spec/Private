@@ -12,7 +12,7 @@
     "skipLibCheck": true,
     "moduleResolution": "bundler",
     "isolatedModules": true,
-    "moduleDetection": "force",
+    "mmoduleDetectionoduleDetection": "force",
     "allowJs": true,
     "jsx": "react-jsx",
     "paths": {

@@ -1,3 +1,4 @@
+import { getLocalDateString } from '../../../core/utils';
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -6,7 +7,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../../store/AppContext';
 import { AdvanceRecord } from '../../../core/types';
-import { printDocument, getQRCodeUrl } from '../../../services/pdfService';
+import { printDocument, getQRCodeUrl, exportPDF } from '../../../services/pdfService';
 import { 
   HandCoins, 
   Plus, 
@@ -22,7 +23,7 @@ export const AdvancesPage: React.FC = () => {
   const [workerId, setWorkerId] = useState('');
   const [amount, setAmount] = useState(100);
   const [type, setType] = useState<'advance' | 'withdrawal'>('advance');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(getLocalDateString());
   const [notes, setNotes] = useState('');
   
   const [selectedVoucherForPrint, setSelectedVoucherForPrint] = useState<AdvanceRecord | null>(null);
@@ -67,9 +68,7 @@ export const AdvancesPage: React.FC = () => {
     setTimeout(() => {
       const content = document.getElementById('printable_voucher_box');
       if (content) {
-        import('../../../services/pdfService').then(({ exportPDF }) => {
-          exportPDF(content.innerHTML, `سند_صرف_${v.id}`, mode);
-        });
+        exportPDF(content.innerHTML, `سند_صرف_${v.id}`, mode);
       }
     }, 100);
   };
